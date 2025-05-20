@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Farming Monitoring System</title>
+  <!-- Firebase SDK -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.0/firebase-app-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.0/firebase-auth-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.0/firebase-database-compat.min.js"></script>
+  <!-- Chart.js Date Adapter (Luxon) -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
+  <!-- Chart.js for data visualization -->
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="MainStyle.css"/>
+</head>
+<body>
+
+ <!-- Landing Page Section -->
+<div id="landing-page" class="landing-page">
+    <header class="landing-header">
+        <img src="images/logoPic.png" alt="Smart Farming Logo" class="site-logo" style="height: 80px; margin-bottom: 16px;">
+        <h1>Smart Farming Monitor</h1>
+        <div class="nav-buttons">
+            <button id="show-login-btn">Login</button>
+            <button id="show-register-btn">Register</button>
+        </div>
+    </header>
+    <section class="hero-section">
+        <h2>Real-time Farming Monitoring System</h2>
+        <p>Monitor your farm's soil and environmental conditions with our IoT-based solution. Track temperature, humidity, and soil NPK levels to optimize your crop growth and yield.</p>
+        <button class="cta-button" id="hero-get-started">Get Started</button>
+    </section>
+
+    <section class="features-section">
+        <h2>Key Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🌡️</div>
+                <h3>Temperature Monitoring</h3>
+                <p>Track real-time temperature changes with precision. Set alerts for critical thresholds to protect your crops from extreme conditions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💧</div>
+                <h3>Humidity Sensing</h3>
+                <p>Monitor soil moisture and air humidity levels to maintain optimal growing conditions and efficiently manage irrigation.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌱</div>
+                <h3>NPK Analysis</h3>
+                <p>Track Nitrogen, Phosphorus, and Potassium levels in your soil to ensure proper nutrient balance for healthy plant growth.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Data Visualization</h3>
+                <p>View comprehensive charts and analytics to understand trends and make data-driven decisions for your farm.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Remote Access</h3>
+                <p>Monitor your farm from anywhere using our cloud-based dashboard accessible on any device.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3>ESP8266 Integration</h3>
+                <p>Simple setup with NodeMCU ESP8266 devices for cost-effective and reliable sensor deployment across your farm.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="landing-footer">
+        <p>&copy; 2025 Smart Farming Monitor. All rights reserved.</p>
+    </footer>
+</div>
+
+<!-- Login Section -->
+<div id="login-section" class="auth-container">
+    <div class="auth-form">
+        <h2>Login to Your Account</h2>
+        <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="Enter your password">
+        </div>
+        <button class="auth-button" id="login-button">Login</button>
+        <div class="error-message" id="login-error"></div>
+        <div class="auth-switch">
+            <span>Don't have an account? </span>
+            <a id="switch-to-register">Register</a>
+        </div>
+    </div>
+</div>
+
+<!-- Register Section -->
+<div id="register-section" class="auth-container">
+    <div class="auth-form">
+        <h2>Create New Account</h2>
+        <div class="form-group">
+            <label for="register-name">Full Name</label>
+            <input type="text" id="register-name" placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+            <label for="register-email">Email</label>
+            <input type="email" id="register-email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+            <label for="register-password">Password</label>
+            <input type="password" id="register-password" placeholder="Create a password">
+        </div>
+        <div class="form-group">
+            <label for="register-confirm">Confirm Password</label>
+            <input type="password" id="register-confirm" placeholder="Confirm your password">
+        </div>
+        <button class="auth-button" id="register-button">Register</button>
+        <div class="error-message" id="register-error"></div>
+        <div class="auth-switch">
+            <span>Already have an account? </span>
+            <a id="switch-to-login">Login</a>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Section -->
+<div id="dashboard" class="dashboard" data-page="overview">
+    <header class="dashboard-header">
+        <h1>Smart Farming Monitor</h1>
+        <div class="user-info">
+            <span id="user-display-name">User  Name</span>
+            <button class="logout-button" id="logout-button">Logout</button>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="active" data-page="overview"><i class="fas fa-tachometer-alt"></i><span>Overview</span></li>
+                <li data-page="devices"><i class="fas fa-microchip"></i><span>Devices</span></li>
+                <li data-page="analytics"><i class="fas fa-chart-line"></i><span>Analytics</span></li>
+                <li data-page="alerts"><i class="fas fa-bell"></i><span>Alerts</span></li>
+                <li data-page="settings"><i class="fas fa-cog"></i><span>Settings</span></li>
+                <li data-page="about"><i class="fas fa-info-circle"></i><span>About</span></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <!-- Overview Page -->
+            <div id="overview-page" class="page-content page-view active"> 
+                <h2>Farm Overview</h2>
+                <p class="last-updated">Last updated: <span id="last-update-time">Apr 30, 2025, 10:45 AM</span></p>
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">🌡️</div>
+                            <div class="card-title">Temperature</div>
+                        </div>
+                        <div class="card-value" id="temp-value"></div>
+                        <div class="card-footer status-good"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">💧</div>
+                            <div class="card-title">Humidity</div>
+                        </div>
+                        <div class="card-value" id="humidity-value"></div>
+                        <div class="card-footer status-warning"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">🌱</div>
+                            <div class="card-title">Nitrogen (N)</div>
+                        </div>
+                        <div class="card-value" id="nitrogen-value"></div>
+                        <div class="card-footer status-good"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">🌱</div>
+                            <div class="card-title">Phosphorus (P)</div>
+                        </div>
+                        <div class="card-value" id="phosphorus-value"></div>
+                        <div class="card-footer status-good"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">🌱</div>
+                            <div class="card-title">Potassium (K)</div>
+                        </div>
+                        <div class="card-value" id="potassium-value"></div>
+                        <div class="card-footer status-danger"></div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-header"><h3 class="chart-title">Temperature & Humidity (24h)</h3></div>
+                        <canvas id="tempHumidityChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-header"><h3 class="chart-title">NPK Levels (Last 7 Days)</h3></div>
+                        <canvas id="npkChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Devices Page -->
+            <div id="devices-page" class="page-content page-view">
+                <div class="devices-header">
+                    <h2>Device Management</h2>
+                    <button id="add-device-btn" class="action-button primary">
+                        <i class="fas fa-plus"></i> Add Device
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="device-search" placeholder="Search devices...">
+                        </div>
+                        <button id="refresh-devices" class="action-button">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <table id="devices-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Device Name</th>
+                                <th>Device ID</th>
+                                <th>Location</th>
+                                <th>Actions</th> <!-- New Actions Column -->
+                            </tr>
+                        </thead>
+                        <tbody id="devices-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div id="add-device-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-modal">&times;</span>
+                        <h3>Register New Device</h3>
+                        <form id="device-registration-form">
+                            <div class="form-group">
+                                <label>Device Name</label>
+                                <input type="text" id="device-name" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Device ID (ESP8266 ID)</label>
+                                <input type="text" id="device-id" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Location</label>
+                                <input type="text" id="device-location" />
+                            </div>
+                            <button type="submit" class="auth-button">Register Device</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings-section" class="page-content page-view" style="background-color: #E8F5E9; padding: 20px; border-radius: 8px;">
+                <div class="settings-header">
+                    <h2>Settings</h2>
+                </div>
+                <div class="settings-container">
+                    <form id="settings-form">
+                        <div class="form-group">
+                            <label for="email-notifications">Email Notifications</label>
+                            <label class="switch">
+                                <input type="checkbox" id="email-notifications" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password">Change Password</label>
+                            <input type="password" id="new-password" placeholder="Enter new password">
+                        </div>
+                        <button type="submit" class="auth-button">Save Changes</button>
+                        <div class="success-message" id="settings-success"></div>
+                        <div class="error-message" id="settings-error"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- About Us Section -->
+            <div id="about-section" class="page-content page-view">
+                <div class="about-header">
+                    <h2>About Us</h2>
+                </div>
+                <div class="about-container">
+                    <p>Welcome to the Smart Farming Monitoring System, where we leverage technology to optimize agricultural practices. Our mission is to provide farmers with real-time data on soil and environmental conditions to enhance crop yield and sustainability.</p>
+                    <p>Our team is dedicated to developing innovative solutions that empower farmers to make data-driven decisions. We believe in the power of technology to transform agriculture and improve food security.</p>
+                    <p>For inquiries, please contact us at: <a href="mailto:info@smartfarming.com">info@smartfarming.com</a></p>
+                    
+                    <div class="team-members">
+                        <div class="team-member">
+                            <img src="images/Charles.png"alt="Team Leader" />
+                            <p>Team Leader Charles Amiel S. Gutierrez</p>
+                        </div>
+                        <div class="team-member">
+                            <img src="images/Lawrence.png" alt="Team Member " />
+                            <p>Team Member Larence Talag</p>
+                        </div>
+                        <div class="team-member">
+                            <img src="images/Vince.png" alt="Team Member " />
+                            <p>Team Member Vince Ammen</p>
+                        </div>
+                        <div class="team-member">
+                            <img src="images/Richmond.png" alt="Team Member " />
+                            <p>Team Member Richmond Caydoy</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts Page -->
+            <div id="alerts-page" class="page-content page-view">
+                <div class="alerts-header">
+                    <h2>Alerts</h2>
+                </div>
+                <div class="alerts-container">
+                    <ul id="alerts-list" class="alerts-list"></ul> <!-- This is where alerts will be displayed -->
+                </div>
+            </div>
+
+            <!-- Analytics Page -->
+            <div id="analytics-page" class="page-content page-view">
+                <div class="analytics-container">
+                    <h2>Environmental Analytics</h2>
+                    <div class="time-filter">
+                        <button data-period="1day" class="active">Last 24 Hours</button>
+                        <button data-period="1week">Last Week</button>
+                        <button data-period="1month">Last Month</button>
+                    </div>
+
+                    <div class="data-type-filter">
+                        <label><input type="checkbox" data-type="nitrogen" checked> Nitrogen (N)</label>
+                        <label><input type="checkbox" data-type="phosphorus" checked> Phosphorus (P)</label>
+                        <label><input type="checkbox" data-type="potassium" checked> Potassium (K)</label>
+                        <label><input type="checkbox" data-type="temperature" checked> Temperature</label>
+                        <label><input type="checkbox" data-type="humidity" checked> Humidity</label>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="analyticsChart"></canvas>
+                        <div id="analytics-loading" class="loading">Loading data...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+  <!-- JavaScript Files -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/sideFunc.js"></script>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("gutierrezcharles426@gmail");
+    })();
+  </script>
+  <script src="js/alertFunc.js"></script>
+ 
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCkwy-CdhcHCqA3CNZo1jrKsHrzN4Rdlj4",
+    authDomain: "smart-farm-c7003.firebaseapp.com",
+    databaseURL: "https://smart-farm-c7003-default-rtdb.firebaseio.com",
+    projectId: "smart-farm-c7003",
+    storageBucket: "smart-farm-c7003.firebasestorage.app",
+    messagingSenderId: "734603522825",
+    appId: "1:734603522825:web:faaa627d090424aec799d8",
+    measurementId: "G-ZSSW7JHJDB"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+</body>
+</html>
